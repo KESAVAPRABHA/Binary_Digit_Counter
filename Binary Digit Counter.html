@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Digit Counter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Orbitron', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #1a2a6c, #b21f1f, #0b0b0b);
+            color: #ffffff;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 1s ease-in-out;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .container:hover {
+            transform: scale(1.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #00e6e6;
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00e6e6, 0 0 20px #00e6e6, 0 0 30px #00e6e6; }
+            to { text-shadow: 0 0 20px #00e6e6, 0 0 30px #00e6e6, 0 0 40px #00e6e6; }
+        }
+        input[type="number"] {
+            padding: 12px;
+            border: 2px solid #00e6e6;
+            border-radius: 4px;
+            width: calc(100% - 28px);
+            margin-bottom: 15px;
+            font-size: 1em;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="number"]:focus {
+            border-color: #ff4500;
+            box-shadow: 0 0 10px #ff4500;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #0078ff, #00d4ff);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1em;
+            margin-top: 10px;
+            margin-right: 5px;
+            margin-left: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background: linear-gradient(45deg, #005bb5, #009dff);
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00e6e6;
+            animation: slideIn 0.5s ease-in-out;
+            transition: color 0.3s ease;
+        }
+        .result p:hover {
+            color: #ff4500;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+            input[type="number"] {
+                padding: 10px;
+            }
+            button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Binary Digit Counter</h2>
+        <input type="number" id="decimalInput" placeholder="Enter a positive integer" min="0">
+        <div>
+            <button onclick="countBinaryDigits('non-recursive')">Non-Recursive</button>
+            <button onclick="countBinaryDigits('recursive')">Recursive</button>
+        </div>
+        <div class="result" id="resultNonRecursive"></div>
+        <div class="result" id="resultRecursive"></div>
+    </div>
+
+    <script>
+        function countBinaryDigits(method) {
+            const decimalInput = document.getElementById('decimalInput').value;
+            const decimalNumber = parseInt(decimalInput);
+
+            if (isNaN(decimalNumber) || decimalNumber < 0) {
+                document.getElementById('resultNonRecursive').innerText = "Please enter a valid positive integer.";
+                document.getElementById('resultRecursive').innerText = "Please enter a valid positive integer.";
+                return;
+            }
+
+            let binaryRepresentation, numberOfBinaryDigits, operationCount = 0;
+
+            // Start measuring time for empirical analysis
+            const startTime = performance.now();
+
+            if (method === 'non-recursive') {
+                const result = toBinaryStringNonRecursive(decimalNumber);
+                binaryRepresentation = result.binary;
+                numberOfBinaryDigits = result.length;
+                operationCount = result.operations;
+            } else if (method === 'recursive') {
+                const result = toBinaryStringRecursive(decimalNumber);
+                binaryRepresentation = result.binary;
+                numberOfBinaryDigits = result.length;
+                operationCount = result.operations;
+            }
+
+            // End measuring time for empirical analysis
+            const endTime = performance.now();
+            const timeTaken = ((endTime - startTime) * 1000000).toFixed(4); // Convert milliseconds to nanoseconds
+
+            if (method === 'non-recursive') {
+                document.getElementById('resultNonRecursive').innerHTML = `
+                    <p><strong>Non-Recursive Method:</strong></p>
+                    <p>The number of binary digits is: <strong>${numberOfBinaryDigits}</strong></p>
+                    <p>Binary representation: <strong>${binaryRepresentation}</strong></p>
+                    <p>Time taken: <strong>${timeTaken} ns</strong></p>
+                    <p>Step count: <strong>${operationCount}</strong></p>
+                `;
+            } else if (method === 'recursive') {
+                document.getElementById('resultRecursive').innerHTML = `
+                    <p><strong>Recursive Method:</strong></p>
+                    <p>The number of binary digits is: <strong>${numberOfBinaryDigits}</strong></p>
+                    <p>Binary representation: <strong>${binaryRepresentation}</strong></p>
+                    <p>Time taken: <strong>${timeTaken} ns</strong></p>
+                    <p>Step count: <strong>${operationCount}</strong></p>
+                `;
+            }
+        }
+
+        function toBinaryStringNonRecursive(n) {
+            if (n === 0) return { binary: "0", length: 1, operations: 1 };
+
+            let binary = "";
+            let count = 0;
+
+            while (n > 0) {
+                binary = (n % 2).toString() + binary;
+                n = Math.floor(n / 2);
+                count++;
+            }
+
+            return { binary: binary, length: binary.length, operations: count };
+        }
+
+        function toBinaryStringRecursive(n, operations = 0) {
+            if (n === 0) {
+                return { binary: "0", length: 1, operations: operations + 1 };
+            } else if (n === 1) {
+                return { binary: "1", length: 1, operations: operations + 1 };
+            } else {
+                const result = toBinaryStringRecursive(Math.floor(n / 2), operations + 1);
+                return {
+                    binary: result.binary + (n % 2).toString(),
+                    length: result.length + 1,
+                    operations: result.operations + 1
+                };
+            }
+        }
+    </script>
+</body>
+</html>
